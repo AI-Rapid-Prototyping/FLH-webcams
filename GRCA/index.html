@@ -254,6 +254,47 @@
       font-size: 0.92rem;
     }
 
+    .timestamp-banner {
+      margin-top: 1rem;
+      padding: 0.95rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, #f7faf4 0%, #eef4ea 100%);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .timestamp-banner-copy {
+      display: grid;
+      gap: 0.15rem;
+      min-width: 0;
+    }
+
+    .timestamp-banner-label {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .timestamp-banner-value {
+      margin: 0;
+      font-size: clamp(1.05rem, 1.5vw + 0.8rem, 1.45rem);
+      line-height: 1.1;
+      font-weight: 700;
+      color: #11181f;
+    }
+
+    .timestamp-banner-note {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
     .section-title {
       margin: 0 0 0.5rem;
       font-size: 1rem;
@@ -337,6 +378,14 @@
       overflow: hidden;
     }
 
+    .hourly-chart-wrap {
+      background:
+        linear-gradient(to right, rgba(31, 94, 59, 0.12) 0, rgba(31, 94, 59, 0.12) 1px, transparent 1px) 0 0 / calc(100% / 15) 100%,
+        linear-gradient(180deg, #fafaf7 0%, #f2f4ee 100%);
+      background-origin: content-box, padding-box;
+      background-repeat: repeat-x, no-repeat;
+    }
+
     .interval-y-grid {
       position: absolute;
       top: 1.5rem;
@@ -389,6 +438,14 @@
 
     .hourly-bars {
       grid-template-columns: repeat(15, minmax(0, 1fr));
+    }
+
+    .hourly-bars .interval-bar-stack {
+      max-width: none;
+    }
+
+    .hourly-bars .interval-bar-fill {
+      min-height: 0.55rem;
     }
 
     .interval-bar-item {
@@ -513,11 +570,6 @@
           </div>
           <div class="card-body grid" id="metrics">
             <div class="metrics-grid">
-              <div class="metric">
-                <p class="metric-label">Current timestamp (MST)</p>
-                <p class="metric-value" id="lastSynced">--</p>
-                <p class="metric-note" id="lastSyncedNote">Feed refreshes about every 15 minutes</p>
-              </div>
               <div class="metric metric-lanes">
                 <p class="metric-label">Current Queue by Lane</p>
                 <div class="lane-counts" aria-label="Current queue by lane">
@@ -566,8 +618,8 @@
             </div>
             <div class="chart-stack">
               <div class="interval-chart">
-                <p class="section-title">Queue by 15-minute interval (6 AM - 8 PM)</p>
-                <div class="interval-chart-wrap" id="intervalChartWrap" aria-label="Queue by 15-minute interval chart, 6am to 8pm">
+                <p class="section-title">Average queue by 15-minute interval (6 AM - 8 PM)</p>
+                <div class="interval-chart-wrap" id="intervalChartWrap" aria-label="Average queue by 15-minute interval chart, 6am to 8pm">
                   <div class="interval-y-grid" aria-hidden="true"><div class="interval-y-grid-mid"></div></div>
                   <div class="interval-y-axis" id="intervalYAxis" aria-hidden="true">
                     <span>0</span>
@@ -582,12 +634,12 @@
                     <span style="left: 75%; transform: translateX(-50%);">4:30p</span>
                     <span style="left: 100%; transform: translateX(-100%);">8p</span>
                   </div>
-                  <div class="interval-empty" id="intervalEmpty" aria-hidden="true">No queue interval data available for this day.</div>
+                  <div class="interval-empty" id="intervalEmpty" aria-hidden="true">No average queue data available for this day.</div>
                 </div>
               </div>
               <div class="interval-chart">
                 <p class="section-title">Unique vehicles by hour (6 AM - 8 PM)</p>
-                <div class="interval-chart-wrap" id="hourlyChartWrap" aria-label="Unique vehicles by hour chart, 6am to 8pm">
+                <div class="interval-chart-wrap hourly-chart-wrap" id="hourlyChartWrap" aria-label="Unique vehicles by hour chart, 6am to 8pm">
                   <div class="interval-y-grid" aria-hidden="true"><div class="interval-y-grid-mid"></div></div>
                   <div class="interval-y-axis" id="hourlyYAxis" aria-hidden="true">
                     <span>0</span>
@@ -605,6 +657,13 @@
                   <div class="interval-empty" id="hourlyEmpty" aria-hidden="true">No hourly unique-vehicle data available for this day.</div>
                 </div>
               </div>
+            </div>
+            <div class="timestamp-banner" aria-label="Latest feed timestamp">
+              <div class="timestamp-banner-copy">
+                <p class="timestamp-banner-label">Latest timestamp (MST)</p>
+                <p class="timestamp-banner-value" id="lastSynced">--</p>
+              </div>
+              <p class="timestamp-banner-note" id="lastSyncedNote">Feed refreshes about every 15 minutes</p>
             </div>
           </div>
           <div class="error" id="errorBox" role="status" aria-live="polite"></div>
@@ -665,7 +724,7 @@
     const ARIZONA_TIME_ZONE = "America/Phoenix";
     const USER_TIME_ZONE = Intl.DateTimeFormat().resolvedOptions().timeZone || "local time";
     const FEED_REFRESH_INTERVAL_MS = 15000;
-    const ARCHIVE_REFRESH_INTERVAL_MS = 60000;
+    const ARCHIVE_REFRESH_INTERVAL_MS = 120000;
     const IMAGE_REFRESH_INTERVAL_MS = 15000;
     const INTERVAL_WINDOW_START_MINUTE = 6 * 60;
     const INTERVAL_WINDOW_END_MINUTE = 20 * 60;
@@ -806,6 +865,13 @@
       return `${displayHour12}${suffix}`;
     };
 
+    const formatChartValue = (value) => {
+      const numericValue = Number(value);
+      if (!Number.isFinite(numericValue)) return "0";
+      const rounded = Math.round((numericValue + Number.EPSILON) * 10) / 10;
+      return Number.isInteger(rounded) ? `${rounded}` : rounded.toFixed(1);
+    };
+
     const setError = (message) => {
       els.errorBox.textContent = message;
       els.errorBox.style.display = message ? "block" : "none";
@@ -897,27 +963,50 @@
         if (!parts || !rounded) continue;
         if (rounded.minuteOfDay < INTERVAL_WINDOW_START_MINUTE || rounded.minuteOfDay > INTERVAL_WINDOW_END_MINUTE) continue;
 
+        const queueValue = Number(row.vehicles_in_line ?? row.total_vehicles_detected ?? 0);
+        if (!Number.isFinite(queueValue)) continue;
+
         const intervalKey = `${parts.year}-${parts.month}-${parts.day} ${rounded.label}`;
         const current = byInterval.get(intervalKey) || {
           sortMinutes: rounded.sortMinutes,
           minuteOfDay: rounded.minuteOfDay,
           label: rounded.label,
-          total: Number(row.vehicles_in_line ?? row.total_vehicles_detected ?? 0),
+          total: 0,
+          sampleCount: 0,
           sourceTimestamp: row.timestamp_utc
         };
+        current.total += queueValue;
+        current.sampleCount += 1;
         const sourceTimestamp = new Date(row.timestamp_utc);
         if (!Number.isNaN(sourceTimestamp.getTime()) && sourceTimestamp > new Date(current.sourceTimestamp)) {
-          current.total = Number(row.vehicles_in_line ?? row.total_vehicles_detected ?? 0);
           current.sourceTimestamp = row.timestamp_utc;
         }
         byInterval.set(intervalKey, current);
       }
 
-      return [...byInterval.values()].sort((a, b) => a.sortMinutes - b.sortMinutes);
+      return [...byInterval.values()]
+        .map((entry) => ({
+          ...entry,
+          average: entry.sampleCount > 0 ? entry.total / entry.sampleCount : 0,
+          total: entry.sampleCount > 0 ? entry.total / entry.sampleCount : 0
+        }))
+        .sort((a, b) => a.sortMinutes - b.sortMinutes);
     }
 
     function buildHourlySummary(rows, dayKey) {
       const byHour = new Map();
+
+      for (let hourOfDay = 0; hourOfDay < 24; hourOfDay += 1) {
+        const hourKey = `__hour_${String(hourOfDay).padStart(2, "0")}`;
+        byHour.set(hourKey, {
+          sortMinutes: hourOfDay * 60,
+          hourOfDay,
+          label: formatArizonaHourLabel(hourOfDay),
+          total: 0,
+          sourceTimestamp: null
+        });
+      }
+
       const sortedRows = [...rows].sort((left, right) => new Date(left.timestamp_utc) - new Date(right.timestamp_utc));
       let previousDailyCount = null;
 
@@ -930,7 +1019,6 @@
 
         const hourOfDay = Number(parts.hour);
         if (!Number.isFinite(hourOfDay)) continue;
-        if (hourOfDay < HOURLY_WINDOW_START_HOUR || hourOfDay > HOURLY_WINDOW_END_HOUR) continue;
 
         const currentDailyCount = Number(row.daily_vehicle_count);
         if (!Number.isFinite(currentDailyCount)) continue;
@@ -941,16 +1029,11 @@
         previousDailyCount = Math.max(previousDailyCount === null ? 0 : previousDailyCount, currentDailyCount);
         if (delta <= 0) continue;
 
-        const hourKey = `${parts.year}-${parts.month}-${parts.day} ${String(hourOfDay).padStart(2, "0")}`;
-        const current = byHour.get(hourKey) || {
-          sortMinutes: hourOfDay * 60,
-          hourOfDay,
-          label: formatArizonaHourLabel(hourOfDay),
-          total: 0,
-          sourceTimestamp: row.timestamp_utc
-        };
+        const hourKey = `__hour_${String(hourOfDay).padStart(2, "0")}`;
+        const current = byHour.get(hourKey);
+        if (!current) continue;
         current.total += delta;
-        if (new Date(row.timestamp_utc) > new Date(current.sourceTimestamp)) {
+        if (!current.sourceTimestamp || new Date(row.timestamp_utc) > new Date(current.sourceTimestamp)) {
           current.sourceTimestamp = row.timestamp_utc;
         }
         byHour.set(hourKey, current);
@@ -963,10 +1046,10 @@
       if (!axisElement) return;
 
       const peak = Math.max(0, Number(maxTotal) || 0);
-      const labels = [peak, Math.round(peak / 2), 0];
+      const labels = [peak, peak / 2, 0];
       axisElement.innerHTML = labels.map((label, index) => {
         const position = index === 0 ? "top: -0.35rem;" : index === 1 ? "top: calc(50% - 0.35rem);" : "bottom: -0.35rem;";
-        return `<span style="${position}">${label}</span>`;
+        return `<span style="${position}">${formatChartValue(label)}</span>`;
       }).join("");
     }
 
@@ -1102,6 +1185,7 @@
         const peak = getDailyPeak(archiveRows, currentDayKey);
         const queueIntervals = buildQueueIntervalSummary(archiveRows, currentDayKey);
         const hourlyIntervals = buildHourlySummary(archiveRows, currentDayKey);
+        const filteredHourlyIntervals = hourlyIntervals.filter((entry) => entry.hourOfDay >= HOURLY_WINDOW_START_HOUR && entry.hourOfDay <= HOURLY_WINDOW_END_HOUR);
         const filteredQueueIntervals = queueIntervals.filter((entry) => entry.minuteOfDay >= INTERVAL_WINDOW_START_MINUTE && entry.minuteOfDay <= INTERVAL_WINDOW_END_MINUTE);
         const currentHourSummary = Number.isFinite(currentHourOfDay)
           ? hourlyIntervals.find((entry) => entry.hourOfDay === currentHourOfDay)
@@ -1128,16 +1212,16 @@
           maxTotal: filteredQueueIntervals.length > 0 ? Math.max(...filteredQueueIntervals.map((entry) => entry.total), 1) : 0,
           slotCount: INTERVAL_WINDOW_SLOT_COUNT,
           slotFromEntry: (entry) => Math.floor(((entry.minuteOfDay ?? INTERVAL_WINDOW_START_MINUTE) - INTERVAL_WINDOW_START_MINUTE) / 15),
-          tooltipForEntry: (entry) => `${entry.label} - ${entry.total} in line`,
-          emptyMessage: "No queue interval data available for this day.",
+          tooltipForEntry: (entry) => `${entry.label} - avg queue ${formatChartValue(entry.total)} vehicles`,
+          emptyMessage: "No average queue data available for this day.",
         });
 
         renderBarChart({
           axisElement: els.hourlyYAxis,
           barsElement: els.hourlyBars,
           emptyElement: els.hourlyEmpty,
-          entries: hourlyIntervals,
-          maxTotal: hourlyIntervals.length > 0 ? Math.max(...hourlyIntervals.map((entry) => entry.total), 1) : 0,
+          entries: filteredHourlyIntervals,
+          maxTotal: filteredHourlyIntervals.length > 0 ? Math.max(...filteredHourlyIntervals.map((entry) => entry.total), 1) : 0,
           slotCount: HOURLY_WINDOW_SLOT_COUNT,
           slotFromEntry: (entry) => entry.hourOfDay - HOURLY_WINDOW_START_HOUR,
           tooltipForEntry: (entry) => `${entry.label} - ${entry.total} new vehicles`,
@@ -1156,7 +1240,7 @@
           slotCount: INTERVAL_WINDOW_SLOT_COUNT,
           slotFromEntry: () => 0,
           tooltipForEntry: () => "",
-          emptyMessage: "No queue interval data available for this day.",
+          emptyMessage: "No average queue data available for this day.",
         });
         renderBarChart({
           axisElement: els.hourlyYAxis,
