@@ -114,7 +114,7 @@
 
     .camera-grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: minmax(0, 1fr);
       gap: 1rem;
     }
 
@@ -316,6 +316,11 @@
       border-top: 1px solid var(--border);
     }
 
+    .chart-stack {
+      display: grid;
+      gap: 1rem;
+    }
+
     .interval-chart-wrap {
       position: relative;
       margin-top: 0.75rem;
@@ -380,6 +385,10 @@
       gap: 0;
       padding: 0 0.4rem;
       z-index: 1;
+    }
+
+    .hourly-bars {
+      grid-template-columns: repeat(15, minmax(0, 1fr));
     }
 
     .interval-bar-item {
@@ -489,7 +498,7 @@
       <div>
         <p class="agency">U.S. DOT Volpe Center</p>
         <h1 class="title">Grand Canyon National Park</h1>
-        <p class="subtle">Live camera view and daily queue metrics sourced from the live feed on GitHub.</p>
+        <p class="subtle">Live camera view plus queue, hourly unique, and daily traffic metrics sourced from the published GitHub feed and archive.</p>
       </div>
       <div class="status-pill" id="syncPill"><span class="dot" aria-hidden="true"></span><span id="syncText">Loading latest data</span></div>
     </div>
@@ -500,7 +509,7 @@
       <section class="hero">
         <aside class="card" aria-labelledby="summaryHeading">
           <div class="card-head">
-            <h2 class="card-title" id="summaryHeading">Queue Summary</h2>
+            <h2 class="card-title" id="summaryHeading">Queue, Hourly, and Daily Traffic</h2>
           </div>
           <div class="card-body grid" id="metrics">
             <div class="metrics-grid">
@@ -545,29 +554,56 @@
                 <p class="metric-note" id="peakQueueNote">Resolved from archivefeed.csv and archive rows</p>
               </div>
               <div class="metric">
-                <p class="metric-label">Vehicles Detected on SR 64</p>
-                <p class="metric-value" id="entranceRoadCount">--</p>
-                <p class="metric-note">From the latest published feed</p>
+                <p class="metric-label">Daily unique vehicles</p>
+                <p class="metric-value" id="dailyVehicleCount">--</p>
+                <p class="metric-note" id="dailyVehicleCountNote">From the latest published feed</p>
+              </div>
+              <div class="metric">
+                <p class="metric-label">New vehicles this hour</p>
+                <p class="metric-value" id="hourlyVehicleCount">--</p>
+                <p class="metric-note" id="hourlyVehicleCountNote">From the latest published feed</p>
               </div>
             </div>
-            <div class="interval-chart">
-              <p class="section-title">Queue by 15-minute interval (6 AM - 8 PM)</p>
-              <div class="interval-chart-wrap" id="intervalChartWrap" aria-label="Queue by 15-minute interval chart, 6am to 8pm">
-                <div class="interval-y-grid" aria-hidden="true"><div class="interval-y-grid-mid"></div></div>
-                <div class="interval-y-axis" id="intervalYAxis" aria-hidden="true">
-                  <span>0</span>
-                  <span>0</span>
-                  <span>0</span>
+            <div class="chart-stack">
+              <div class="interval-chart">
+                <p class="section-title">Queue by 15-minute interval (6 AM - 8 PM)</p>
+                <div class="interval-chart-wrap" id="intervalChartWrap" aria-label="Queue by 15-minute interval chart, 6am to 8pm">
+                  <div class="interval-y-grid" aria-hidden="true"><div class="interval-y-grid-mid"></div></div>
+                  <div class="interval-y-axis" id="intervalYAxis" aria-hidden="true">
+                    <span>0</span>
+                    <span>0</span>
+                    <span>0</span>
+                  </div>
+                  <div class="interval-bars" id="intervalBars"></div>
+                  <div class="interval-axis" aria-hidden="true">
+                    <span style="left: 0%; transform: translateX(0);">6a</span>
+                    <span style="left: 25%; transform: translateX(-50%);">9:30a</span>
+                    <span style="left: 50%; transform: translateX(-50%);">1p</span>
+                    <span style="left: 75%; transform: translateX(-50%);">4:30p</span>
+                    <span style="left: 100%; transform: translateX(-100%);">8p</span>
+                  </div>
+                  <div class="interval-empty" id="intervalEmpty" aria-hidden="true">No queue interval data available for this day.</div>
                 </div>
-                <div class="interval-bars" id="intervalBars"></div>
-                <div class="interval-axis" aria-hidden="true">
-                  <span style="left: 0%; transform: translateX(0);">6a</span>
-                  <span style="left: 25%; transform: translateX(-50%);">9:30a</span>
-                  <span style="left: 50%; transform: translateX(-50%);">1p</span>
-                  <span style="left: 75%; transform: translateX(-50%);">4:30p</span>
-                  <span style="left: 100%; transform: translateX(-100%);">8p</span>
+              </div>
+              <div class="interval-chart">
+                <p class="section-title">Unique vehicles by hour (6 AM - 8 PM)</p>
+                <div class="interval-chart-wrap" id="hourlyChartWrap" aria-label="Unique vehicles by hour chart, 6am to 8pm">
+                  <div class="interval-y-grid" aria-hidden="true"><div class="interval-y-grid-mid"></div></div>
+                  <div class="interval-y-axis" id="hourlyYAxis" aria-hidden="true">
+                    <span>0</span>
+                    <span>0</span>
+                    <span>0</span>
+                  </div>
+                  <div class="interval-bars hourly-bars" id="hourlyBars"></div>
+                  <div class="interval-axis" aria-hidden="true">
+                    <span style="left: 0%; transform: translateX(0);">6a</span>
+                    <span style="left: 25%; transform: translateX(-50%);">10a</span>
+                    <span style="left: 50%; transform: translateX(-50%);">2p</span>
+                    <span style="left: 75%; transform: translateX(-50%);">6p</span>
+                    <span style="left: 100%; transform: translateX(-100%);">8p</span>
+                  </div>
+                  <div class="interval-empty" id="hourlyEmpty" aria-hidden="true">No hourly unique-vehicle data available for this day.</div>
                 </div>
-                <div class="interval-empty" id="intervalEmpty" aria-hidden="true"></div>
               </div>
             </div>
           </div>
@@ -594,24 +630,6 @@
           <p class="camera-caption">Click the link above to view the live feed.</p>
         </article>
 
-        <article class="card" aria-labelledby="secondaryCamHeading">
-          <div class="card-head">
-            <h2 class="card-title" id="secondaryCamHeading">AZ DOT</h2>
-          </div>
-          <img
-            id="azdotCameraImage"
-            class="camera-frame"
-            src="https://raw.githubusercontent.com/AI-Rapid-Prototyping/Public-Lands-Computer-Vision/main/GRCA/azdot_latest_annotated.jpg"
-            alt="Latest annotated AZ DOT camera view"
-            loading="eager"
-          />
-          <a class="camera-link" href="https://www.nps.gov/media/webcam/view.htm?id=7D6A3936-E1C5-C480-4FA08472583AA182&r=/grca/learn/photosmultimedia/webcams.htm" target="_blank" rel="noopener noreferrer">
-            Open the live camera source
-          </a>
-          <p class="camera-caption">The image above displays the latest annotated AZ DOT camera snapshot.</p>
-          <p class="camera-caption">State Route 64 (Mile 235.15)</p>
-          <p class="camera-caption">Click the link above to view the live feed.</p>
-        </article>
       </section>
 
       <section class="feed-section">
@@ -633,7 +651,7 @@
   </main>
 
   <footer class="footer">
-    Data source: U.S. DOT Volpe GitHub feed and archive CSV for Grand Canyon National Park.
+    Data source: Grand Canyon South Entrance GitHub feed and archive CSV.
   </footer>
 
   <script>
@@ -643,7 +661,6 @@
     const ARCHIVE_PATH = "GRCA/archivefeed.csv";
     const RAW_BASE_URL = `https://raw.githubusercontent.com/${REPOSITORY}/${BRANCH}`;
     const IMAGE_BASE_URL = `https://raw.githubusercontent.com/${REPOSITORY}/${BRANCH}/GRCA/grca_latest_annotated.jpg`;
-    const AZDOT_IMAGE_BASE_URL = `https://raw.githubusercontent.com/${REPOSITORY}/${BRANCH}/GRCA/azdot_latest_annotated.jpg`;
     const GITHUB_API_BASE = `https://api.github.com/repos/${REPOSITORY}/contents`;
     const ARIZONA_TIME_ZONE = "America/Phoenix";
     const USER_TIME_ZONE = Intl.DateTimeFormat().resolvedOptions().timeZone || "local time";
@@ -653,6 +670,9 @@
     const INTERVAL_WINDOW_START_MINUTE = 6 * 60;
     const INTERVAL_WINDOW_END_MINUTE = 20 * 60;
     const INTERVAL_WINDOW_SLOT_COUNT = ((INTERVAL_WINDOW_END_MINUTE - INTERVAL_WINDOW_START_MINUTE) / 15) + 1;
+    const HOURLY_WINDOW_START_HOUR = 6;
+    const HOURLY_WINDOW_END_HOUR = 20;
+    const HOURLY_WINDOW_SLOT_COUNT = (HOURLY_WINDOW_END_HOUR - HOURLY_WINDOW_START_HOUR) + 1;
     const INTERVAL_AXIS_LABELS = [
       { minuteOfDay: 6 * 60, label: "6a" },
       { minuteOfDay: 10 * 60, label: "10a" },
@@ -672,16 +692,21 @@
       laneTotal: document.getElementById("laneTotal"),
       peakQueue: document.getElementById("peakQueue"),
       peakQueueNote: document.getElementById("peakQueueNote"),
-      entranceRoadCount: document.getElementById("entranceRoadCount"),
+      dailyVehicleCount: document.getElementById("dailyVehicleCount"),
+      dailyVehicleCountNote: document.getElementById("dailyVehicleCountNote"),
+      hourlyVehicleCount: document.getElementById("hourlyVehicleCount"),
+      hourlyVehicleCountNote: document.getElementById("hourlyVehicleCountNote"),
       intervalYAxis: document.getElementById("intervalYAxis"),
       intervalBars: document.getElementById("intervalBars"),
       intervalEmpty: document.getElementById("intervalEmpty"),
+      hourlyYAxis: document.getElementById("hourlyYAxis"),
+      hourlyBars: document.getElementById("hourlyBars"),
+      hourlyEmpty: document.getElementById("hourlyEmpty"),
       feedStatus: document.getElementById("feedStatus"),
       feedTimestamp: document.getElementById("feedTimestamp"),
       feedMessage: document.getElementById("feedMessage"),
       errorBox: document.getElementById("errorBox"),
-      cameraImage: document.getElementById("cameraImage"),
-      azdotCameraImage: document.getElementById("azdotCameraImage")
+      cameraImage: document.getElementById("cameraImage")
     };
 
     const formatArizonaDateTime = (value) => {
@@ -775,6 +800,12 @@
       };
     };
 
+    const formatArizonaHourLabel = (hourOfDay) => {
+      const displayHour12 = hourOfDay % 12 || 12;
+      const suffix = hourOfDay >= 12 ? "p" : "a";
+      return `${displayHour12}${suffix}`;
+    };
+
     const setError = (message) => {
       els.errorBox.textContent = message;
       els.errorBox.style.display = message ? "block" : "none";
@@ -802,9 +833,6 @@
     async function refreshCameraImage(cacheKey) {
       try {
         els.cameraImage.src = `${IMAGE_BASE_URL}?cb=${encodeURIComponent(cacheKey)}`;
-        if (els.azdotCameraImage) {
-          els.azdotCameraImage.src = `${AZDOT_IMAGE_BASE_URL}?cb=${encodeURIComponent(cacheKey)}`;
-        }
       } catch (error) {
         console.warn("Camera image refresh failed", error);
       }
@@ -829,7 +857,14 @@
         lane3: Number(map.get("vehicles_in_lane_3") || 0),
         lane4: Number(map.get("vehicles_in_lane_4") || 0),
         inLine: Number(map.get("vehicles_in_line") || 0),
-        entranceRoad: Number(map.get("on_entrance_road") || 0)
+        dailyVehicleCount: map.has("daily_vehicle_count")
+          ? Number(map.get("daily_vehicle_count") || 0)
+          : Number(map.get("total_vehicles_detected") || 0),
+        dailyVehicleCountFallback: !map.has("daily_vehicle_count"),
+        hourlyVehicleCount: map.has("hourly_vehicle_count")
+          ? Number(map.get("hourly_vehicle_count") || 0)
+          : null,
+        hourlyVehicleCountFallback: !map.has("hourly_vehicle_count")
       };
     }
 
@@ -851,7 +886,7 @@
       return rows;
     }
 
-    function buildIntervalSummary(rows, dayKey) {
+    function buildQueueIntervalSummary(rows, dayKey) {
       const byInterval = new Map();
       for (const row of rows) {
         const rowKey = formatArizonaDateKey(row.timestamp_utc);
@@ -881,15 +916,90 @@
       return [...byInterval.values()].sort((a, b) => a.sortMinutes - b.sortMinutes);
     }
 
-    function renderIntervalYAxis(maxTotal = 0) {
-      if (!els.intervalYAxis) return;
+    function buildHourlySummary(rows, dayKey) {
+      const byHour = new Map();
+      const sortedRows = [...rows].sort((left, right) => new Date(left.timestamp_utc) - new Date(right.timestamp_utc));
+      let previousDailyCount = null;
+
+      for (const row of sortedRows) {
+        const rowKey = formatArizonaDateKey(row.timestamp_utc);
+        if (rowKey !== dayKey) continue;
+
+        const parts = getArizonaParts(row.timestamp_utc);
+        if (!parts) continue;
+
+        const hourOfDay = Number(parts.hour);
+        if (!Number.isFinite(hourOfDay)) continue;
+        if (hourOfDay < HOURLY_WINDOW_START_HOUR || hourOfDay > HOURLY_WINDOW_END_HOUR) continue;
+
+        const currentDailyCount = Number(row.daily_vehicle_count);
+        if (!Number.isFinite(currentDailyCount)) continue;
+
+        const delta = previousDailyCount === null
+          ? Math.max(0, currentDailyCount)
+          : Math.max(0, currentDailyCount - previousDailyCount);
+        previousDailyCount = Math.max(previousDailyCount === null ? 0 : previousDailyCount, currentDailyCount);
+        if (delta <= 0) continue;
+
+        const hourKey = `${parts.year}-${parts.month}-${parts.day} ${String(hourOfDay).padStart(2, "0")}`;
+        const current = byHour.get(hourKey) || {
+          sortMinutes: hourOfDay * 60,
+          hourOfDay,
+          label: formatArizonaHourLabel(hourOfDay),
+          total: 0,
+          sourceTimestamp: row.timestamp_utc
+        };
+        current.total += delta;
+        if (new Date(row.timestamp_utc) > new Date(current.sourceTimestamp)) {
+          current.sourceTimestamp = row.timestamp_utc;
+        }
+        byHour.set(hourKey, current);
+      }
+
+      return [...byHour.values()].sort((a, b) => a.sortMinutes - b.sortMinutes);
+    }
+
+    function renderChartYAxis(axisElement, maxTotal = 0) {
+      if (!axisElement) return;
 
       const peak = Math.max(0, Number(maxTotal) || 0);
       const labels = [peak, Math.round(peak / 2), 0];
-      els.intervalYAxis.innerHTML = labels.map((label, index) => {
+      axisElement.innerHTML = labels.map((label, index) => {
         const position = index === 0 ? "top: -0.35rem;" : index === 1 ? "top: calc(50% - 0.35rem);" : "bottom: -0.35rem;";
         return `<span style="${position}">${label}</span>`;
       }).join("");
+    }
+
+    function renderBarChart({
+      axisElement,
+      barsElement,
+      emptyElement,
+      entries,
+      maxTotal,
+      slotCount,
+      slotFromEntry,
+      tooltipForEntry,
+      emptyMessage,
+    }) {
+      if (!axisElement || !barsElement || !emptyElement) return;
+
+      if (entries.length > 0) {
+        renderChartYAxis(axisElement, maxTotal);
+        emptyElement.textContent = "";
+        emptyElement.style.display = "none";
+        barsElement.innerHTML = entries.map((entry) => {
+          const height = Math.max((entry.total / maxTotal) * 100, entry.total > 0 ? 8 : 0);
+          const slot = Math.min(Math.max(slotFromEntry(entry), 0), slotCount - 1);
+          const tooltip = tooltipForEntry(entry);
+          return `<div class="interval-bar-item" style="grid-column: ${slot + 1};" title="${tooltip}" aria-label="${tooltip}"><div class="interval-bar-stack"><span class="interval-bar-fill" style="height: ${height.toFixed(1)}%"></span></div></div>`;
+        }).join("");
+        return;
+      }
+
+      renderChartYAxis(axisElement, 0);
+      barsElement.innerHTML = "";
+      emptyElement.textContent = emptyMessage;
+      emptyElement.style.display = "flex";
     }
 
     async function loadArchiveRows(cacheKey) {
@@ -964,7 +1074,14 @@
         els.laneC.textContent = `${current.lane3}`;
         els.laneD.textContent = `${current.lane4}`;
         els.laneTotal.textContent = `${current.inLine}`;
-        els.entranceRoadCount.textContent = `${current.entranceRoad}`;
+        els.dailyVehicleCount.textContent = `${current.dailyVehicleCount}`;
+        els.dailyVehicleCountNote.textContent = current.dailyVehicleCountFallback
+          ? "Older feed format detected; showing frame count until the daily total is published."
+          : "From the latest published feed";
+        els.hourlyVehicleCount.textContent = Number.isFinite(current.hourlyVehicleCount) ? `${current.hourlyVehicleCount}` : "--";
+        els.hourlyVehicleCountNote.textContent = current.hourlyVehicleCountFallback
+          ? "Older feed format detected; the dashboard will derive this hour from archive rows when available."
+          : "From the latest published feed";
         feedLoaded = true;
       } catch (error) {
         console.error(error);
@@ -980,9 +1097,15 @@
       try {
         const archiveRows = await getArchiveRows(cacheKey);
         const currentDayKey = formatArizonaDateKey(current.timestampUtc);
+        const currentParts = current.timestampUtc ? getArizonaParts(current.timestampUtc) : null;
+        const currentHourOfDay = currentParts ? Number(currentParts.hour) : null;
         const peak = getDailyPeak(archiveRows, currentDayKey);
-        const intervals = buildIntervalSummary(archiveRows, currentDayKey);
-        const filteredIntervals = intervals.filter((entry) => entry.minuteOfDay >= INTERVAL_WINDOW_START_MINUTE && entry.minuteOfDay <= INTERVAL_WINDOW_END_MINUTE);
+        const queueIntervals = buildQueueIntervalSummary(archiveRows, currentDayKey);
+        const hourlyIntervals = buildHourlySummary(archiveRows, currentDayKey);
+        const filteredQueueIntervals = queueIntervals.filter((entry) => entry.minuteOfDay >= INTERVAL_WINDOW_START_MINUTE && entry.minuteOfDay <= INTERVAL_WINDOW_END_MINUTE);
+        const currentHourSummary = Number.isFinite(currentHourOfDay)
+          ? hourlyIntervals.find((entry) => entry.hourOfDay === currentHourOfDay)
+          : null;
 
         if (peak) {
           els.peakQueue.textContent = `${peak.peak}`;
@@ -992,28 +1115,60 @@
           els.peakQueueNote.textContent = "No matching rows found for the feed day";
         }
 
-        if (filteredIntervals.length > 0) {
-          const maxTotal = Math.max(...filteredIntervals.map((entry) => entry.total), 1);
-          renderIntervalYAxis(maxTotal);
-          els.intervalEmpty.style.display = "none";
-          els.intervalBars.innerHTML = filteredIntervals.map((entry) => {
-            const height = Math.max((entry.total / maxTotal) * 100, entry.total > 0 ? 8 : 0);
-            const slot = Math.min(Math.floor(((entry.minuteOfDay ?? INTERVAL_WINDOW_START_MINUTE) - INTERVAL_WINDOW_START_MINUTE) / 15), INTERVAL_WINDOW_SLOT_COUNT - 1);
-            const tooltip = `${entry.label} - ${entry.total} in line`;
-            return `<div class="interval-bar-item" style="grid-column: ${slot + 1};" title="${tooltip}" aria-label="${tooltip}"><div class="interval-bar-stack"><span class="interval-bar-fill" style="height: ${height.toFixed(1)}%"></span></div></div>`;
-          }).join("");
-        } else {
-          renderIntervalYAxis(0);
-          els.intervalBars.innerHTML = "";
-          els.intervalEmpty.style.display = "flex";
+        if (!Number.isFinite(current.hourlyVehicleCount) && currentHourSummary) {
+          els.hourlyVehicleCount.textContent = `${currentHourSummary.total}`;
+          els.hourlyVehicleCountNote.textContent = "Derived from archive rows for the current hour.";
         }
+
+        renderBarChart({
+          axisElement: els.intervalYAxis,
+          barsElement: els.intervalBars,
+          emptyElement: els.intervalEmpty,
+          entries: filteredQueueIntervals,
+          maxTotal: filteredQueueIntervals.length > 0 ? Math.max(...filteredQueueIntervals.map((entry) => entry.total), 1) : 0,
+          slotCount: INTERVAL_WINDOW_SLOT_COUNT,
+          slotFromEntry: (entry) => Math.floor(((entry.minuteOfDay ?? INTERVAL_WINDOW_START_MINUTE) - INTERVAL_WINDOW_START_MINUTE) / 15),
+          tooltipForEntry: (entry) => `${entry.label} - ${entry.total} in line`,
+          emptyMessage: "No queue interval data available for this day.",
+        });
+
+        renderBarChart({
+          axisElement: els.hourlyYAxis,
+          barsElement: els.hourlyBars,
+          emptyElement: els.hourlyEmpty,
+          entries: hourlyIntervals,
+          maxTotal: hourlyIntervals.length > 0 ? Math.max(...hourlyIntervals.map((entry) => entry.total), 1) : 0,
+          slotCount: HOURLY_WINDOW_SLOT_COUNT,
+          slotFromEntry: (entry) => entry.hourOfDay - HOURLY_WINDOW_START_HOUR,
+          tooltipForEntry: (entry) => `${entry.label} - ${entry.total} new vehicles`,
+          emptyMessage: "No hourly unique-vehicle data available for this day.",
+        });
       } catch (error) {
         console.warn("Archive data unavailable", error);
         els.peakQueue.textContent = "--";
         els.peakQueueNote.textContent = "Archive data temporarily unavailable";
-        renderIntervalYAxis(0);
-        els.intervalBars.innerHTML = "";
-        els.intervalEmpty.style.display = "flex";
+        renderBarChart({
+          axisElement: els.intervalYAxis,
+          barsElement: els.intervalBars,
+          emptyElement: els.intervalEmpty,
+          entries: [],
+          maxTotal: 0,
+          slotCount: INTERVAL_WINDOW_SLOT_COUNT,
+          slotFromEntry: () => 0,
+          tooltipForEntry: () => "",
+          emptyMessage: "No queue interval data available for this day.",
+        });
+        renderBarChart({
+          axisElement: els.hourlyYAxis,
+          barsElement: els.hourlyBars,
+          emptyElement: els.hourlyEmpty,
+          entries: [],
+          maxTotal: 0,
+          slotCount: HOURLY_WINDOW_SLOT_COUNT,
+          slotFromEntry: () => 0,
+          tooltipForEntry: () => "",
+          emptyMessage: "No hourly unique-vehicle data available for this day.",
+        });
       }
 
       els.syncText.textContent = `Updated ${formatArizonaDateTimeWithZone(current.timestampUtc)}`;
