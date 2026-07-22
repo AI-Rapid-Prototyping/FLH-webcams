@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Federal Lands Highway Webcams | USDOT Volpe Center</title>
+    <style>
+        /* Base Styles and Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Public Sans', system-ui, -apple-system, sans-serif;
+            background-color: #f4f6f9;
+            color: #212121;
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Header (USDOT Branding) */
+        header {
+            background-color: #002b5e; /* USDOT Navy */
+            color: #ffffff;
+            padding: 1rem 2rem;
+            border-bottom: 4px solid #0052a5; /* Bright blue accent */
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+        }
+
+        .agency-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .agency-subtitle {
+            font-size: 0.85rem;
+            color: #a3c2e0;
+            margin-top: 2px;
+        }
+
+        /* Hero Section */
+        .hero {
+            background-color: #ffffff;
+            padding: 4rem 2rem;
+            text-align: center;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            color: #002b5e;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.125rem;
+            color: #555555;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Main Content & Grid */
+        main {
+            flex-grow: 1;
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        /* Card Styles */
+        .card {
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 2rem;
+            text-decoration: none;
+            color: inherit;
+            border: 1px solid #e0e0e0;
+            border-top: 4px solid #0052a5;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            border-top-color: #003b7a;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #002b5e;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-type {
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: #757575;
+            margin-bottom: 1rem;
+        }
+
+        .card-action {
+            margin-top: auto;
+            color: #0052a5;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card:hover .card-action {
+            text-decoration: underline;
+        }
+
+        /* Coming Soon Card (Disabled State) */
+        .card.disabled {
+            border-top: 4px solid #9e9e9e;
+            background-color: #f9f9f9;
+            cursor: not-allowed;
+            pointer-events: none; /* Prevents clicking */
+        }
+
+        .card.disabled:hover {
+            transform: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .card.disabled .card-title {
+            color: #757575;
+        }
+
+        .card.disabled .card-action {
+            color: #9e9e9e;
+            text-decoration: none;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #212121;
+            color: #ffffff;
+            text-align: center;
+            padding: 2rem;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-container">
+            <div>
+                <div class="agency-title">U.S. Department of Transportation</div>
+                <div class="agency-subtitle">John A. Volpe National Transportation Systems Center</div>
+            </div>
+        </div>
+    </header>
+
+    <div class="hero">
+        <h1>Federal Lands Highway Webcams</h1>
+        <p>Monitor live traffic, queue lengths, and parking conditions at key entrance stations and trailheads across National Parks and Forests.</p>
+    </div>
+
+    <main>
+        <div class="grid-container">
+            <!-- Arches Card -->
+            <a href="https://ai-rapid-prototyping.github.io/FLH-webcams/ARCH/" target="_blank" rel="noopener noreferrer" class="card">
+                <div class="card-type">National Park</div>
+                <div class="card-title">Arches Entrance Station</div>
+                <div class="card-action">View Live Camera &rarr;</div>
+            </a>
+
+            <!-- Grand Canyon Card -->
+            <a href="https://ai-rapid-prototyping.github.io/FLH-webcams/GRCA/" target="_blank" rel="noopener noreferrer" class="card">
+                <div class="card-type">National Park</div>
+                <div class="card-title">Grand Canyon South Entrance Station</div>
+                <div class="card-action">View Live Camera &rarr;</div>
+            </a>
+
+            <!-- White River Card -->
+            <a href="https://ai-rapid-prototyping.github.io/FLH-webcams/WCT/" target="_blank" rel="noopener noreferrer" class="card">
+                <div class="card-type">National Forest</div>
+                <div class="card-title">White River Willow Creek Trail Parking Lot</div>
+                <div class="card-action">View Live Camera &rarr;</div>
+            </a>
+
+            <!-- Glacier Apgar Village Card (Coming Soon) -->
+            <div class="card disabled">
+                <div class="card-type">National Park</div>
+                <div class="card-title">Glacier Apgar Village</div>
+                <div class="card-action">Coming Soon</div>
+            </div>
+            
+            <!-- Glacier West Entrance Card (Coming Soon) -->
+            <div class="card disabled">
+                <div class="card-type">National Park</div>
+                <div class="card-title">Glacier West Entrance</div>
+                <div class="card-action">Coming Soon</div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        &copy; 2026 U.S. Department of Transportation Volpe Center. This is a rapid prototype.
+    </footer>
+
+</body>
+</html>
