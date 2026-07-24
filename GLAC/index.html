@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Glacier National Park webcam traffic and parking analytics." />
+  <title>Glacier National Park Webcam Analytics</title>
+  <style>
+    :root {
+      --bg: #eef5f6;
+      --bg-2: #f9fbfc;
+      --card: rgba(255, 255, 255, 0.9);
+      --ink: #10212a;
+      --muted: #5b6b75;
+      --accent: #0d6b7f;
+      --border: rgba(16, 33, 42, 0.12);
+      --shadow: 0 18px 50px rgba(16, 33, 42, 0.10);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", Arial, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(16, 166, 190, 0.14), transparent 28%),
+        linear-gradient(180deg, var(--bg), var(--bg-2));
+    }
+
+    .shell {
+      width: min(1120px, calc(100% - 2rem));
+      margin: 0 auto;
+      padding: 28px 0 48px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 18px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .brand {
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .hero {
+      padding: 28px;
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      background: linear-gradient(135deg, rgba(16, 33, 42, 0.92), rgba(12, 82, 106, 0.90));
+      color: #fff;
+      box-shadow: var(--shadow);
+    }
+
+    .eyebrow {
+      margin: 0 0 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      font-size: 0.76rem;
+      color: rgba(255, 255, 255, 0.72);
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 780px;
+      font-size: clamp(2rem, 4vw, 3.4rem);
+      line-height: 1;
+    }
+
+    .subtitle {
+      max-width: 680px;
+      margin: 12px 0 0;
+      color: rgba(255, 255, 255, 0.84);
+      line-height: 1.5;
+    }
+
+    .section-heading {
+      margin: 28px 0 14px;
+    }
+
+    .section-heading h2 {
+      margin: 0;
+      font-size: 1.35rem;
+    }
+
+    .section-heading p {
+      margin: 5px 0 0;
+      color: var(--muted);
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .card {
+      display: flex;
+      min-height: 245px;
+      padding: 22px;
+      overflow: hidden;
+      color: var(--ink);
+      text-decoration: none;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(13, 107, 127, 0.38);
+      box-shadow: 0 22px 56px rgba(16, 33, 42, 0.15);
+    }
+
+    .card:focus-visible {
+      outline: 3px solid rgba(13, 107, 127, 0.35);
+      outline-offset: 4px;
+    }
+
+    .card-content {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+    }
+
+    .card-icon {
+      display: grid;
+      width: 48px;
+      height: 48px;
+      margin-bottom: 34px;
+      place-items: center;
+      color: var(--accent);
+      background: rgba(13, 107, 127, 0.08);
+      border: 1px solid rgba(13, 107, 127, 0.16);
+      border-radius: 16px;
+    }
+
+    .card-icon svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .card-label {
+      margin: 0 0 7px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .card h3 {
+      margin: 0;
+      font-size: 1.45rem;
+    }
+
+    .card-description {
+      margin: 8px 0 22px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .card-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: auto;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .arrow {
+      font-size: 1.25rem;
+      transition: transform 180ms ease;
+    }
+
+    .card:hover .arrow { transform: translateX(4px); }
+
+    @media (max-width: 800px) {
+      .card-grid { grid-template-columns: 1fr; }
+      .card { min-height: 220px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .card,
+      .arrow { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <div class="topbar">
+      <span class="brand">Glacier National Park</span>
+      <span>Webcam Analytics</span>
+    </div>
+
+    <section class="hero">
+      <p class="eyebrow">Glacier National Park Webcam Analytics</p>
+      <h1>Traffic and parking conditions at a glance</h1>
+      <p class="subtitle">Choose a location to view the latest vehicle counts, queue information, parking availability, and annotated webcam imagery.</p>
+    </section>
+
+    <section aria-labelledby="locations-heading">
+      <div class="section-heading">
+        <h2 id="locations-heading">Webcam locations</h2>
+        <p>Select a dashboard to view its latest feed.</p>
+      </div>
+
+      <div class="card-grid">
+        <a class="card" href="apgar_village.html">
+          <div class="card-content">
+            <span class="card-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 20h18L15 9l-3 5-2-3-7 9Z" />
+                <path d="m13.5 11.5 1.5 1 1.3-.7" />
+              </svg>
+            </span>
+            <p class="card-label">Vehicle activity</p>
+            <h3>Apgar Village</h3>
+            <p class="card-description">View the latest overall vehicle count and annotated webcam image.</p>
+            <span class="card-link">Open dashboard <span class="arrow" aria-hidden="true">&rarr;</span></span>
+          </div>
+        </a>
+
+        <a class="card" href="west_entrance.html">
+          <div class="card-content">
+            <span class="card-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 21V7h14v14" />
+                <path d="M3 21h18M8 7V3h8v4M9 12h6M9 16h6" />
+              </svg>
+            </span>
+            <p class="card-label">Entrance traffic</p>
+            <h3>West Entrance</h3>
+            <p class="card-description">View lane-level traffic and the latest overall vehicle count.</p>
+            <span class="card-link">Open dashboard <span class="arrow" aria-hidden="true">&rarr;</span></span>
+          </div>
+        </a>
+
+        <a class="card" href="logan_pass.html">
+          <div class="card-content">
+            <span class="card-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="7" width="18" height="11" rx="2" />
+                <path d="M7 18v2M17 18v2M7 11h10M8 14h.01M16 14h.01" />
+              </svg>
+            </span>
+            <p class="card-label">Queue and parking</p>
+            <h3>Logan Pass</h3>
+            <p class="card-description">View the current vehicle queue and available parking spaces.</p>
+            <span class="card-link">Open dashboard <span class="arrow" aria-hidden="true">&rarr;</span></span>
+          </div>
+        </a>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
