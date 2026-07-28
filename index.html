@@ -1,403 +1,565 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="USDOT Volpe Center Federal Lands webcam traffic, queue, and parking analytics.">
-    <title>ITS JPO | USDOT Volpe Center Federal Lands Webcams</title>
-    <style>
-        :root {
-            --navy: #002b5e;
-            --blue: #005ea8;
-            --blue-dark: #00477f;
-            --ink: #1b2b3a;
-            --muted: #5d6975;
-            --surface: #ffffff;
-            --border: #dce3ea;
-            --background: #f3f6f9;
-            --research: #925f00;
-            --research-bg: #fff4d6;
-            --shadow: 0 14px 35px rgba(0, 43, 94, 0.09);
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gateway Natural Area Parking Status</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0b1220;
+      --bg2: #111a2d;
+      --panel: rgba(12, 18, 33, 0.78);
+      --panel-strong: rgba(18, 27, 47, 0.96);
+      --line: rgba(255, 255, 255, 0.08);
+      --text: #edf2ff;
+      --muted: #a8b3cf;
+      --accent: #8be9fd;
+      --accent-2: #7dd3fc;
+      --success: #4ade80;
+      --warning: #fbbf24;
+      --shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
+    }
 
-        * { box-sizing: border-box; }
+    * { box-sizing: border-box; }
 
-        body {
-            display: flex;
-            min-height: 100vh;
-            margin: 0;
-            flex-direction: column;
-            color: var(--ink);
-            background:
-                radial-gradient(circle at 8% 12%, rgba(0, 94, 168, 0.09), transparent 24rem),
-                var(--background);
-            font-family: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
-            line-height: 1.6;
-        }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", "Aptos", "Trebuchet MS", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(125, 211, 252, 0.22), transparent 34%),
+        radial-gradient(circle at right 20%, rgba(74, 222, 128, 0.16), transparent 24%),
+        linear-gradient(160deg, var(--bg), var(--bg2));
+    }
 
-        header {
-            color: #ffffff;
-            background: var(--navy);
-            border-bottom: 4px solid var(--blue);
-        }
+    .wrap {
+      width: min(1280px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 24px 0 40px;
+    }
 
-        .header-container {
-            display: flex;
-            width: min(1180px, calc(100% - 2rem));
-            min-height: 76px;
-            margin: 0 auto;
-            align-items: center;
-            gap: 14px;
-        }
+    header {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: 1.2fr 0.8fr;
+      align-items: end;
+      margin-bottom: 22px;
+    }
 
-        .agency-mark {
-            display: flex;
-            width: 54px;
-            height: 54px;
-            padding: 3px;
-            flex: 0 0 auto;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            background: #ffffff;
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            border-radius: 0;
-        }
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 5vw, 4.25rem);
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+    }
 
-        .agency-mark img {
-            display: block;
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            border-radius: 0;
-        }
+    .eyebrow {
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      font-size: 0.74rem;
+      margin-bottom: 10px;
+    }
 
-        .agency-title {
-            font-size: 1.1rem;
-            font-weight: 700;
-            letter-spacing: 0.02em;
-        }
+    .lede {
+      margin: 12px 0 0;
+      color: var(--muted);
+      max-width: 64ch;
+      line-height: 1.5;
+    }
 
-        .agency-subtitle {
-            margin-top: 1px;
-            color: #b8d2ea;
-            font-size: 0.82rem;
-        }
+    .meta {
+      justify-self: end;
+      text-align: right;
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
 
-        .hero {
-            padding: clamp(3.5rem, 8vw, 6rem) 1rem;
-            color: #ffffff;
-            background:
-                linear-gradient(120deg, rgba(0, 43, 94, 0.98), rgba(0, 94, 168, 0.90)),
-                var(--navy);
-        }
+    .grid {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: repeat(12, 1fr);
+    }
 
-        .hero-content {
-            width: min(900px, 100%);
-            margin: 0 auto;
-            text-align: center;
-        }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+    }
 
-        .eyebrow {
-            margin: 0 0 0.75rem;
-            color: #bcdcf6;
-            font-size: 0.78rem;
-            font-weight: 800;
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
-        }
+    .count-panel {
+      grid-column: span 4;
+      padding: 22px;
+      display: grid;
+      gap: 10px;
+    }
 
-        .hero h1 {
-            margin: 0;
-            font-size: clamp(2.1rem, 5vw, 3.7rem);
-            line-height: 1.08;
-            text-wrap: balance;
-        }
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      align-items: stretch;
+    }
 
-        .hero p:last-child {
-            max-width: 760px;
-            margin: 1.2rem auto 0;
-            color: rgba(255, 255, 255, 0.82);
-            font-size: clamp(1rem, 2vw, 1.16rem);
-        }
+    .metric-block {
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 18px;
+      padding: 14px 14px 16px;
+      display: grid;
+      gap: 8px;
+    }
 
-        main {
-            width: min(1180px, calc(100% - 2rem));
-            margin: 0 auto;
-            padding: 3rem 0 4.5rem;
-            flex-grow: 1;
-        }
+    .capture-block {
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 18px;
+      padding: 14px 14px 16px;
+      display: grid;
+      gap: 8px;
+    }
 
-        .section-heading {
-            margin-bottom: 1.5rem;
-        }
+    .count {
+      font-size: clamp(4rem, 12vw, 7rem);
+      font-weight: 800;
+      letter-spacing: -0.08em;
+      line-height: 0.9;
+      margin-top: 4px;
+    }
 
-        .section-heading h2 {
-            margin: 0;
-            color: var(--navy);
-            font-size: clamp(1.5rem, 3vw, 2rem);
-        }
+    .availability {
+      font-size: clamp(2.5rem, 7vw, 4.4rem);
+      font-weight: 800;
+      letter-spacing: -0.06em;
+      line-height: 0.95;
+      margin-top: 4px;
+    }
 
-        .section-heading p {
-            margin: 0.3rem 0 0;
-            color: var(--muted);
-        }
+    .availability-high {
+      color: var(--success);
+    }
 
-        .grid-container {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 1.25rem;
-        }
+    .availability-medium {
+      color: var(--warning);
+    }
 
-        .card {
-            display: flex;
-            min-height: 245px;
-            padding: 1.55rem;
-            flex-direction: column;
-            color: inherit;
-            text-decoration: none;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-top: 4px solid var(--blue);
-            border-radius: 14px;
-            box-shadow: 0 3px 12px rgba(0, 43, 94, 0.04);
-            transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
-        }
+    .availability-low {
+      color: #ef4444;
+    }
 
-        .card:hover {
-            transform: translateY(-4px);
-            border-top-color: var(--blue-dark);
-            box-shadow: var(--shadow);
-        }
+    .capture-time {
+      font-size: clamp(1.5rem, 4vw, 2.6rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+    }
 
-        .card:focus-visible {
-            outline: 3px solid rgba(0, 94, 168, 0.35);
-            outline-offset: 4px;
-        }
+    .capture-date {
+      font-size: clamp(1.3rem, 3.4vw, 2.1rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+    }
 
-        .card-topline {
-            display: flex;
-            margin-bottom: 1.25rem;
-            align-items: center;
-            justify-content: space-between;
-            gap: 0.75rem;
-        }
+    .count-label {
+      color: var(--muted);
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+    }
 
-        .card-type,
-        .status {
-            font-size: 0.72rem;
-            font-weight: 800;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-        }
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
 
-        .card-type { color: var(--muted); }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text);
+      font-size: 0.88rem;
+    }
 
-        .status {
-            padding: 0.3rem 0.55rem;
-            color: #17633d;
-            background: #e7f6ed;
-            border-radius: 999px;
-            letter-spacing: 0.04em;
-            white-space: nowrap;
-        }
+    .pill strong {
+      color: var(--accent);
+      font-weight: 700;
+    }
 
-        .status.research {
-            color: var(--research);
-            background: var(--research-bg);
-        }
+    .image-panel {
+      grid-column: span 8;
+      padding: 14px;
+    }
 
-        .status.soon {
-            color: #59636d;
-            background: #e9edf1;
-        }
+    .image-shell {
+      overflow: hidden;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: var(--panel-strong);
+    }
 
-        .card.coming-soon {
-            color: #66717b;
-            background: #f7f8fa;
-            border-top-color: #8c98a3;
-            box-shadow: none;
-        }
+    .image-shell img {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-height: 720px;
+      object-fit: contain;
+      background: #0a0f1b;
+    }
 
-        .card.coming-soon .card-title { color: #45525d; }
+    .image-caption {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 8px 2px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
 
-        .card.coming-soon .card-action {
-            color: #66717b;
-            font-weight: 600;
-        }
+    .section {
+      grid-column: span 12;
+      padding: 18px 20px 20px;
+    }
 
-        .card.coming-soon:hover {
-            transform: none;
-            border-top-color: #8c98a3;
-            box-shadow: none;
-        }
+    .section h2 {
+      margin: 0 0 12px;
+      font-size: 1.05rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--accent-2);
+    }
 
-        .card-title {
-            margin-bottom: 0.55rem;
-            color: var(--navy);
-            font-size: 1.3rem;
-            font-weight: 750;
-            line-height: 1.3;
-        }
+    .details {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
 
-        .card-description {
-            margin: 0 0 1.5rem;
-            color: var(--muted);
-            font-size: 0.94rem;
-        }
+    .detail {
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
 
-        .card-action {
-            display: flex;
-            margin-top: auto;
-            align-items: center;
-            justify-content: space-between;
-            gap: 0.5rem;
-            color: var(--blue);
-            font-weight: 700;
-        }
+    .detail span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.82rem;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
 
-        .arrow { transition: transform 180ms ease; }
-        .card:hover .arrow { transform: translateX(4px); }
+    .detail code {
+      color: var(--text);
+      word-break: break-word;
+    }
 
-        footer {
-            padding: 1.5rem 1rem;
-            color: #d9e1e8;
-            background: #182733;
-            font-size: 0.84rem;
-            text-align: center;
-        }
+    .detections {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
 
-        @media (max-width: 900px) {
-            .grid-container { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-        }
+    .detection {
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
 
-        @media (max-width: 620px) {
-            .grid-container { grid-template-columns: 1fr; }
-            .agency-title { font-size: 0.96rem; }
-            .agency-subtitle { font-size: 0.75rem; }
-            .hero { padding: 3.5rem 1rem; }
-            main { padding-top: 2.25rem; }
-        }
+    .detection .title {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: baseline;
+      margin-bottom: 8px;
+    }
 
-        @media (prefers-reduced-motion: reduce) {
-            .card,
-            .arrow { transition: none; }
-        }
-    </style>
+    .detection strong {
+      font-size: 1rem;
+    }
+
+    .confidence {
+      color: var(--success);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .bbox {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.45;
+      word-break: break-word;
+    }
+
+    .status {
+      color: var(--warning);
+    }
+
+    .empty {
+      color: var(--muted);
+      padding: 12px 2px 2px;
+    }
+
+    .fade-in {
+      animation: rise 500ms ease both;
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 960px) {
+      header {
+        grid-template-columns: 1fr;
+      }
+
+      .meta {
+        justify-self: start;
+        text-align: left;
+      }
+
+      .count-panel,
+      .image-panel {
+        grid-column: span 12;
+      }
+
+      .metric-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .details {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 <body>
-
-    <header>
-        <div class="header-container">
-            <div class="agency-mark">
-                <img src="https://raw.githubusercontent.com/AI-Rapid-Prototyping/FLH-webcams/main/DOT-logo-2.png" alt="U.S. Department of Transportation logo">
-            </div>
-            <div>
-                <div class="agency-title">U.S. Department of Transportation</div>
-                <div class="agency-subtitle">John A. Volpe National Transportation Systems Center</div>
-            </div>
-        </div>
+  <div class="wrap">
+    <header class="fade-in">
+      <div>
+        <div class="eyebrow">Fort Collins Parking Lot</div>
+        <h1>Gateway Natural Area Parking Status</h1>
+      </div>
+      <div class="meta">
+        <div><strong id="stamp">Loading snapshot</strong></div>
+        <div id="source">Source: published GitHub snapshot</div>
+        <div id="schema">Schema: gateway_vehicle_count_v1</div>
+      </div>
     </header>
 
-    <section class="hero">
-        <div class="hero-content">
-            <p class="eyebrow">ITS Joint Program Office</p>
-            <h1>Federal Lands Webcam Analytics</h1>
-            <p>Monitor traffic, queue lengths, and parking conditions at key entrance stations and trailheads across national parks and forests.</p>
+    <main class="grid">
+      <section class="panel count-panel fade-in">
+        <div class="capture-block">
+          <div class="count-label">Last Update</div>
+          <div class="capture-date" id="captureDate">--</div>
+          <div class="capture-time" id="captureTime">--</div>
         </div>
-    </section>
+        <div class="metric-grid">
+          <div class="metric-block">
+            <div class="count-label">Current vehicle count</div>
+            <div class="count" id="count">--</div>
+          </div>
+          <div class="metric-block">
+            <div class="count-label">Parking space availability</div>
+            <div class="availability" id="availability">--</div>
+          </div>
+        </div>
+        <div class="pill-row">
+          <div class="pill"><strong>Status</strong> <span id="status">--</span></div>
+        </div>
+      </section>
 
-    <main>
-        <section aria-labelledby="locations-heading">
-            <div class="section-heading">
-                <h2 id="locations-heading">Webcam locations</h2>
-                <p>Select a location to open its latest camera analytics dashboard.</p>
-            </div>
+      <section class="panel image-panel fade-in">
+        <div class="image-shell">
+          <img id="feedImage" alt="Annotated parking lot image" />
+        </div>
+        <div class="image-caption">
+          <span>Latest annotated camera image</span>
+          <span id="imageUrl">Loading published image</span>
+        </div>
+      </section>
 
-            <div class="grid-container">
-            <!-- Arches Card -->
-            <a href="https://ai-rapid-prototyping.github.io/FLH-webcams/ARCH/" target="_blank" rel="noopener noreferrer" class="card">
-                <div class="card-topline">
-                    <div class="card-type">National Park</div>
-                    <div class="status">Live</div>
-                </div>
-                <div class="card-title">Arches Entrance Station</div>
-                <p class="card-description">Entrance traffic and vehicle queue conditions at Arches National Park.</p>
-                <div class="card-action">View dashboard <span class="arrow" aria-hidden="true">&rarr;</span></div>
-            </a>
+      <section class="panel section fade-in">
+        <h2>Snapshot Details</h2>
+        <div class="details">
+          <div class="detail">
+            <span>Timestamp UTC</span>
+            <code id="timestamp">--</code>
+          </div>
+          <div class="detail">
+            <span>Image URL</span>
+            <code id="image_url">--</code>
+          </div>
+          <div class="detail">
+            <span>Source Page</span>
+            <code id="source_url">--</code>
+          </div>
+          <div class="detail">
+            <span>Output File</span>
+            <code>Ft. Collins/gateway_latest_feed.json</code>
+          </div>
+        </div>
+      </section>
 
-            <!-- Grand Canyon Card -->
-            <a href="https://ai-rapid-prototyping.github.io/FLH-webcams/GRCA/" target="_blank" rel="noopener noreferrer" class="card">
-                <div class="card-topline">
-                    <div class="card-type">National Park</div>
-                    <div class="status">Live</div>
-                </div>
-                <div class="card-title">Grand Canyon South Entrance Station</div>
-                <p class="card-description">Lane-level traffic and queue conditions at the South Entrance.</p>
-                <div class="card-action">View dashboard <span class="arrow" aria-hidden="true">&rarr;</span></div>
-            </a>
-
-            <!-- White River Card -->
-            <a href="https://ai-rapid-prototyping.github.io/FLH-webcams/WCT/" target="_blank" rel="noopener noreferrer" class="card">
-                <div class="card-topline">
-                    <div class="card-type">National Forest</div>
-                    <div class="status">Live</div>
-                </div>
-                <div class="card-title">Willow Creek Trail Parking Lot</div>
-                <p class="card-description">Parking use and availability at the Willow Creek trailhead.</p>
-                <div class="card-action">View dashboard <span class="arrow" aria-hidden="true">&rarr;</span></div>
-            </a>
-
-            <!-- Glacier Apgar Village Card -->
-            <a href="https://ai-rapid-prototyping.github.io/FLH-webcams/GLAC/Apgar/" target="_blank" rel="noopener noreferrer" class="card">
-                <div class="card-topline">
-                    <div class="card-type">Glacier National Park</div>
-                    <div class="status">Live</div>
-                </div>
-                <div class="card-title">Glacier Apgar Village</div>
-                <p class="card-description">Vehicle activity and annotated webcam imagery from Apgar Village.</p>
-                <div class="card-action">View dashboard <span class="arrow" aria-hidden="true">&rarr;</span></div>
-            </a>
-
-            <!-- Glacier Logan Pass Card -->
-            <a href="https://ai-rapid-prototyping.github.io/FLH-webcams/GLAC/Logan_Pass/" target="_blank" rel="noopener noreferrer" class="card">
-                <div class="card-topline">
-                    <div class="card-type">Glacier National Park</div>
-                    <div class="status research">Research in progress</div>
-                </div>
-                <div class="card-title">Glacier Logan Pass</div>
-                <p class="card-description">Experimental queue and parking analytics currently under evaluation.</p>
-                <div class="card-action">View research preview <span class="arrow" aria-hidden="true">&rarr;</span></div>
-            </a>
-
-            <!-- Glacier West Entrance Card -->
-            <a href="https://ai-rapid-prototyping.github.io/FLH-webcams/GLAC/West_Entrance" target="_blank" rel="noopener noreferrer" class="card">
-                <div class="card-topline">
-                    <div class="card-type">Glacier National Park</div>
-                    <div class="status">Live</div>
-                </div>
-                <div class="card-title">Glacier West Entrance</div>
-                <p class="card-description">Lane-level and overall traffic counts at the West Entrance.</p>
-                <div class="card-action">View dashboard <span class="arrow" aria-hidden="true">&rarr;</span></div>
-            </a>
-
-            <!-- Fort Collins Gateway Natural Area Card -->
-            <article class="card coming-soon" aria-disabled="true">
-                <div class="card-topline">
-                    <div class="card-type">Natural Area</div>
-                    <div class="status soon">Coming Soon</div>
-                </div>
-                <div class="card-title">Fort Collins- Gateway Natural Area</div>
-                <p class="card-description">Future webcam analytics for traffic and parking conditions at Gateway Natural Area.</p>
-                <div class="card-action">Dashboard planned</div>
-            </article>
-            </div>
-        </section>
+      <section class="panel section fade-in">
+        <h2>Detections</h2>
+        <div id="detections" class="detections"></div>
+      </section>
     </main>
+  </div>
 
-    <footer>
-        &copy; 2026 U.S. Department of Transportation Volpe Center. This is a rapid prototype.
-    </footer>
+  <script>
+    const fallbackData = {
+      status: "ok",
+      timestamp_utc: "2026-07-17T19:41:23.619755+00:00",
+      source_page_url: "https://www.fortcollins.gov/Activities/Parks-Natural-Areas-and-Trails/Natural-Areas/Visit/Parking-Lot-Cameras",
+      image_url: "https://public.senserasystems.com/public/media/M78031286A82/1784316909699.jpg",
+      vehicle_count: 4,
+      detections: [
+        {
+          class_name: "car",
+          confidence: 0.9051085710525513,
+          xyxy: [2393.729736328125, 1612.2421875, 2631.862060546875, 1762.0677490234375]
+        },
+        {
+          class_name: "car",
+          confidence: 0.8698854446411133,
+          xyxy: [363.82354736328125, 715.4164428710938, 517.045166015625, 778.5101318359375]
+        },
+        {
+          class_name: "car",
+          confidence: 0.7226583361625671,
+          xyxy: [1610.0341796875, 1233.06689453125, 1814.1998291015625, 1313.1407470703125]
+        },
+        {
+          class_name: "car",
+          confidence: 0.4625202715396881,
+          xyxy: [323.2479553222656, 676.7180786132812, 426.143798828125, 725.7134399414062]
+        }
+      ],
+      output_schema: "gateway_vehicle_count_v1"
+    };
 
+    const REPOSITORY = "AI-Rapid-Prototyping/Public-Lands-Computer-Vision";
+    const BRANCH = "main";
+    const JSON_PATH = "Ft.%20Collins/gateway_latest_feed.json";
+    const IMAGE_PATH = "Ft.%20Collins/gateway_latest_annotated.jpg";
+    const RAW_BASE_URL = `https://raw.githubusercontent.com/${REPOSITORY}/${BRANCH}`;
+    const JSON_URL = `${RAW_BASE_URL}/${JSON_PATH}`;
+    const IMAGE_URL = `${RAW_BASE_URL}/${IMAGE_PATH}`;
+    const REFRESH_INTERVAL_MS = 60000;
+
+    const el = (id) => document.getElementById(id);
+
+    function formatPct(value) {
+      return `${Math.round(value * 1000) / 10}%`;
+    }
+
+    function classifyAvailability(vehicleCount) {
+      if (!Number.isFinite(vehicleCount)) return "--";
+      if (vehicleCount <= 6) return "High";
+      if (vehicleCount <= 11) return "Medium";
+      return "Low";
+    }
+
+    function formatCaptureTime(timestamp) {
+      const date = new Date(timestamp);
+      if (Number.isNaN(date.getTime())) return { formattedDate: "--", formattedTime: "--" };
+
+      const formattedDate = new Intl.DateTimeFormat("en-US", {
+        month: "2-digit",
+        day: "2-digit",
+        year: "numeric"
+      }).format(date);
+
+      const formattedTime = new Intl.DateTimeFormat("en-US", {
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true
+      }).format(date);
+
+      return { formattedDate, formattedTime };
+    }
+
+    function render(data) {
+      const vehicleCount = Number(data.vehicle_count);
+      el("count").textContent = Number.isFinite(vehicleCount) ? vehicleCount : "--";
+      el("status").textContent = data.status || "--";
+      const availability = classifyAvailability(vehicleCount);
+      el("availability").textContent = availability;
+      el("availability").className = `availability ${availability === "High" ? "availability-high" : availability === "Medium" ? "availability-medium" : "availability-low"}`;
+      el("timestamp").textContent = data.timestamp_utc || "--";
+      const capture = formatCaptureTime(data.timestamp_utc);
+      el("captureDate").textContent = capture.formattedDate || "--";
+      el("captureTime").textContent = capture.formattedTime || "--";
+      el("image_url").textContent = data.image_url || "--";
+      el("source_url").textContent = data.source_page_url || "--";
+      el("source").textContent = `Source page: ${data.source_page_url || "--"}`;
+      el("schema").textContent = `Schema: ${data.output_schema || "gateway_vehicle_count_v1"}`;
+      el("stamp").textContent = data.timestamp_utc ? `Captured ${data.timestamp_utc}` : "Loading snapshot";
+      el("imageUrl").textContent = IMAGE_URL;
+
+      const detections = Array.isArray(data.detections) ? data.detections : [];
+      const host = el("detections");
+      host.innerHTML = "";
+
+      if (!detections.length) {
+        host.innerHTML = '<div class="empty">No detections listed in the current snapshot.</div>';
+        return;
+      }
+
+      for (const detection of detections) {
+        const card = document.createElement("div");
+        card.className = "detection";
+        card.innerHTML = `
+          <div class="title">
+            <strong>${detection.class_name || "vehicle"}</strong>
+            <span class="confidence">${formatPct(detection.confidence || 0)}</span>
+          </div>
+          <div class="bbox">xyxy: ${Array.isArray(detection.xyxy) ? detection.xyxy.map((n) => Number(n).toFixed(2)).join(", ") : "n/a"}</div>
+        `;
+        host.appendChild(card);
+      }
+    }
+
+    async function loadSnapshot() {
+      const cacheKey = Date.now();
+      try {
+        const response = await fetch(`${JSON_URL}?cb=${encodeURIComponent(cacheKey)}`, { cache: "no-store" });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        render(data);
+        el("feedImage").src = `${IMAGE_URL}?cb=${encodeURIComponent(cacheKey)}`;
+      } catch (error) {
+        render(fallbackData);
+        el("feedImage").src = `${IMAGE_URL}?cb=${encodeURIComponent(cacheKey)}`;
+      }
+    }
+
+    loadSnapshot();
+    setInterval(loadSnapshot, REFRESH_INTERVAL_MS);
+    window.addEventListener("focus", loadSnapshot);
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) loadSnapshot();
+    });
+  </script>
 </body>
 </html>
