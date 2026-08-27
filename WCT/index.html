@@ -297,9 +297,9 @@
               <p class="metric-note" id="lastSyncedNote">Waiting for feed</p>
             </div>
             <div class="metric">
-              <p class="metric-label">Total occupancy</p>
-              <p class="metric-value" id="occupancy">--</p>
-              <p class="metric-note" id="occupancyNote">Potentially occupied spots out of total spaces</p>
+              <p class="metric-label">Space Availability</p>
+              <p class="metric-value" id="availability">--</p>
+              <p class="metric-note" id="availabilityNote">Detected vehicles occupying spots out of 17 spaces</p>
             </div>
             <div class="metric">
               <p class="metric-label">Average dwell time</p>
@@ -336,15 +336,16 @@
     const BRANCH = "main";
     const JSON_PATH = "IP3/WCT/wct_vehicle_count_latest.json";
     const FEED_PATH = "IP3/WCT/wct_latest_feed.txt";
+    const TOTAL_PARKING_SPACES = 17;
     const IMAGE_BASE_URL = `https://raw.githubusercontent.com/${REPOSITORY}/${BRANCH}/IP3/WCT/wct_latest_annotated.jpg`;
-    const RAW_BASE_URL = `https://raw.githubusercontent.com/${REPOSITORY}/${BRANCH}`;
+    const GITHUB_API_BASE = `https://api.github.com/repos/${REPOSITORY}/contents`;
 
     const els = {
       syncText: document.getElementById("syncText"),
       lastSynced: document.getElementById("lastSynced"),
       lastSyncedNote: document.getElementById("lastSyncedNote"),
-      occupancy: document.getElementById("occupancy"),
-      occupancyNote: document.getElementById("occupancyNote"),
+      availability: document.getElementById("availability"),
+      availabilityNote: document.getElementById("availabilityNote"),
       dwell: document.getElementById("dwell"),
       feedStatus: document.getElementById("feedStatus"),
       feedTimestamp: document.getElementById("feedTimestamp"),
@@ -364,11 +365,15 @@
       }).format(date);
     };
 
-    const formatPct = (value) => `${Math.round(value)}%`;
-
     const formatMinutes = (seconds) => {
       if (seconds == null || Number.isNaN(Number(seconds))) return "--";
       return `${(Number(seconds) / 60).toFixed(1)} min`;
+    };
+
+    const getSpaceAvailability = (openSpots) => {
+      if (openSpots <= 5) return "Low";
+      if (openSpots <= 11) return "Medium";
+      return "High";
     };
 
     const parseNumberFromFeed = (text, key) => {
@@ -399,9 +404,12 @@
     };
 
     async function fetchGithubText(path) {
-      const url = `${RAW_BASE_URL}/${path}`;
+      const url = `${GITHUB_API_BASE}/${path}?ref=${encodeURIComponent(BRANCH)}`;
       const response = await fetch(url, {
         cache: "no-store",
+        headers: {
+          Accept: "application/vnd.github.raw",
+        },
       });
       if (!response.ok) throw new Error(`Unable to load ${path}: ${response.status}`);
       return response.text();
@@ -417,16 +425,23 @@
         const data = JSON.parse(jsonText);
 
         const timestamp = data.timestamp_utc || data.timestamp || null;
-        const occupied = Number(data.occupied_spot_count ?? parseNumberFromFeed(feedText, "occupied_spot_count") ?? 0);
-        const empty = Number(data.empty_spot_count ?? parseNumberFromFeed(feedText, "empty_spot_count") ?? 0);
-        const total = occupied + empty;
-        const occupancy = total > 0 ? (occupied / total) * 100 : null;
+        const rawDetectedVehicleCount = data.detected_vehicle_count
+          ?? data.vehicle_count
+          ?? parseNumberFromFeed(feedText, "detected_vehicle_count")
+          ?? parseNumberFromFeed(feedText, "vehicle_count");
+        const detectedVehicleCount = rawDetectedVehicleCount == null ? null : Number(rawDetectedVehicleCount);
+        const occupied = detectedVehicleCount != null && Number.isFinite(detectedVehicleCount)
+          ? Math.max(detectedVehicleCount, 0)
+          : null;
+        const openSpots = occupied == null ? null : Math.max(TOTAL_PARKING_SPACES - occupied, 0);
         const dwellSeconds = data.average_vehicle_dwell_seconds ?? parseNumberFromFeed(feedText, "average_vehicle_dwell_seconds");
 
         els.lastSynced.textContent = formatLocal(timestamp);
         els.lastSyncedNote.textContent = timestamp ? "Sourced from the latest published GitHub snapshot" : "Timestamp unavailable";
-        els.occupancy.textContent = occupancy == null ? "--" : formatPct(occupancy);
-        els.occupancyNote.textContent = total > 0 ? `${occupied} occupied of ${total} spaces` : "No spot totals available";
+        els.availability.textContent = openSpots == null ? "--" : getSpaceAvailability(openSpots);
+        els.availabilityNote.textContent = occupied == null
+          ? "Vehicle count unavailable"
+          : `${occupied} occupied spots detected out of ${TOTAL_PARKING_SPACES} spaces`;
         els.dwell.textContent = formatMinutes(dwellSeconds);
 
         updateFeedPreview(feedText);
